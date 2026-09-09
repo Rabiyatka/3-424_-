@@ -43,7 +43,7 @@ class Program
 
                 case "2":
                     double sum = 0, max = prices[0], min = prices[0];
-                    foreach (double p in prices)
+                    foreach (double p in prices) // для чего нужна строчка тоже не пойму никак
                     {
                         sum += p;
                         if (p > max) max = p;
@@ -58,7 +58,7 @@ class Program
                             if (prices[j] > prices[j + 1])
                             {
                                 double tempP = prices[j]; prices[j] = prices[j + 1]; prices[j + 1] = tempP;
-                                string tempN = names[j]; names[j] = names[j + 1]; names[j + 1] = tempN;
+                                string tempN = names[j]; names[j] = names[j + 1]; names[j + 1] = tempN; // Не понятен сам принцип, самостоятельно не смогу построить подобнкю конструкцию
                             }
                     Console.WriteLine("Отсортировано");
                     break;
