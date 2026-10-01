@@ -3,11 +3,21 @@ using System.Collections.Generic;
 
 namespace Пр3
 {
+    class Statistika
+    {
+        public string Text { get; set; }
+        public int WordsCount { get; set; }
+        public int SentencesCount { get; set; }
+        public int Kolvoglasny { get; set; }
+        public int KolvoSoglasny { get; set; }
+        public string SHORTWORD { get; set; }
+        public string LONGWORD { get; set; }
+        public string ALFAVIT { get; set; }
+        public int[] KolvoBukv { get; set; }
+    }
     class Program
     {
-        static List<string> savedTexts = new List<string>();
-        static List<int> savedKolvoWords = new List<int>();
-        static List<int> savedKolichestvoPredlozheniy = new List<int>();
+        static List<Statistika> savedStats = new List<Statistika>();
 
         static void Main(string[] args)
         {
@@ -32,7 +42,7 @@ namespace Пр3
                         }
                     }
 
-                    // 1. Подсчет предложений
+                    // Подсчет предложений
                     int KolichestvoPredlozheniy = 0;
                     for (int i = 0; i < text.Length; i++)
                     {
@@ -44,18 +54,14 @@ namespace Пр3
                     }
                     if (KolichestvoPredlozheniy == 0 && text.Length > 0)
                     {
-                        KolichestvoPredlozheniy = 1; // Если знаков препинания нет, но текст есть
+                        KolichestvoPredlozheniy = 1;
                     }
 
-                    // 2. Разбиение на слова ручным способом (через Split)
                     char[] separators = new char[] { ' ', ',', '.', '!', '?', '-', ';', ':', '(', ')' };
                     string[] allWords = text.Split(separators, StringSplitOptions.RemoveEmptyEntries);
                     int Kol_voWords = allWords.Length;
-
-                    // 3. Поиск самого длинного и короткого слова
                     string shorter = "";
                     string longest = "";
-
                     if (allWords.Length > 0)
                     {
                         shorter = allWords[0];
@@ -74,15 +80,13 @@ namespace Пр3
                         }
                     }
 
-                    // 4. Подсчет гласных, согласных и частоты букв
+                    // Гласные и согласные
                     int glasnie = 0;
                     int soglasnie = 0;
 
-                    // Строки для проверки букв (в нижнем регистре)
                     string GLASNIE = "аеёиоуыэюяaeiouy";
                     string SOGLASNIE = "бвгджзйклмнпрстфхцчшщbcdfghjklmnpqrstvwxyz";
 
-                    // Массивы для частоты букв: один для алфавита, другой для счетчиков
                     string alfavit = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяabcdefghijklmnopqrstuvwxyz";
                     int[] letter = new int[alfavit.Length];
 
@@ -91,7 +95,6 @@ namespace Пр3
                         char symbol = text[i];
                         char lowerSymbol = char.ToLower(symbol);
 
-                        // Проверяем гласная или согласная
                         if (GLASNIE.Contains(lowerSymbol.ToString()))
                         {
                             glasnie++;
@@ -101,7 +104,6 @@ namespace Пр3
                             soglasnie++;
                         }
 
-                        // Считаем частоту конкретной буквы
                         for (int j = 0; j < alfavit.Length; j++)
                         {
                             if (lowerSymbol == alfavit[j])
@@ -112,7 +114,7 @@ namespace Пр3
                         }
                     }
 
-                    // Вывод резов
+                    // Вывод всей Этой вкусняшки
                     Console.WriteLine("\n--- РЕЗУЛЬТАТЫ АНАЛИЗА ---");
                     Console.WriteLine("Слов в тексте: " + Kol_voWords);
                     Console.WriteLine("Предложений: " + KolichestvoPredlozheniy);
@@ -130,28 +132,53 @@ namespace Пр3
                         }
                     }
 
-                    // Сохраняем всюэту вкусняшку
-                    savedTexts.Add(text);
-                    savedKolvoWords.Add(Kol_voWords);
-                    savedKolichestvoPredlozheniy.Add(KolichestvoPredlozheniy);
+                    //  объект класса со всеми собранными данными
+                    Statistika stats = new Statistika
+                    {
+                        Text = text,
+                        WordsCount = Kol_voWords,
+                        SentencesCount = KolichestvoPredlozheniy,
+                        Kolvoglasny = glasnie,
+                        KolvoSoglasny = soglasnie,
+                        SHORTWORD = shorter,
+                        LONGWORD = longest,
+                        ALFAVIT = alfavit,
+                        KolvoBukv = letter
+                    };
+                   
+                    savedStats.Add(stats);
 
                     Console.WriteLine("\nСтатистика успешно сохранена в историю!");
                 }
                 else if (choice == "2")
                 {
-                    if (savedTexts.Count == 0)
+                    if (savedStats.Count == 0)
                     {
                         Console.WriteLine("История пустенькая.");
                     }
                     else
                     {
                         Console.WriteLine("\n--- ИСТОРИЯ ПРОШЛЫХ ТЕКСТОВ ---");
-                        for (int i = 0; i < savedTexts.Count; i++)
+                        for (int i = 0; i < savedStats.Count; i++)
                         {
+                            Statistika current = savedStats[i]; // данные текущего текста из списка
                             Console.WriteLine("Текст №" + (i + 1));
-                            Console.WriteLine("Начало текста: " + savedTexts[i].Substring(0, Math.Min(30, savedTexts[i].Length)) + "...");
-                            Console.WriteLine("Количествво слов: " + savedKolvoWords[i]);
-                            Console.WriteLine("Количество предложений: " + savedKolichestvoPredlozheniy[i]);
+                            Console.WriteLine("Начало текста: " + current.Text.Substring(0, Math.Min(30, current.Text.Length)) + "...");
+                            Console.WriteLine("Количество слов: " + current.WordsCount);
+                            Console.WriteLine("Количество предложений: " + current.SentencesCount);
+                            Console.WriteLine("Гласных букв: " + current.Kolvoglasny);
+                            Console.WriteLine("Согласных букв: " + current.KolvoSoglasny);
+                            Console.WriteLine("Самое короткое слово: " + current.SHORTWORD);
+                            Console.WriteLine("Самое длинное слово: " + current.LONGWORD);
+                            
+                            Console.WriteLine("Частота букв в этом тексте:");
+                            for (int j = 0; j < current.ALFAVIT.Length; j++)
+                            {
+                                if (current.KolvoBukv[j] > 0)
+                                {
+                                    Console.WriteLine("  Буква '" + current.ALFAVIT[j] + "' встретилась: " + current.KolvoBukv[j] + " раз(а)");
+                                }
+                            }
                         }
                     }
                 }
@@ -163,7 +190,7 @@ namespace Пр3
                 {
                     Console.WriteLine("Всего три пункта, а вы что выбрали, а?");
                 }
-                Console.WriteLine("\nНажмите Enter, чтобы продолжить...");
+                Console.WriteLine("\nНажмите Ентер, чтобы продолжить...");
                 Console.ReadLine();
                 Console.Clear();
             }
