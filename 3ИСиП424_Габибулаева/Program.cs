@@ -1,38 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
-namespace CompactLibrary
+namespace _3ИСИП424
 {
-    public enum Genre { Fiction = 1, Science, History, Fantasy }
-
     public class Book
     {
-        public Guid Id { get; } = Guid.NewGuid();
-        public string Title { get; }
-        public string Author { get; }
-        public Genre Genre { get; }
-        public int Year { get; }
-        public decimal Price { get; }
-
-        public Book(string t, string a, Genre g, int y, decimal p) =>
-            (Title, Author, Genre, Year, Price) =
-            (!string.IsNullOrWhiteSpace(t) ? t : throw new Exception(), !string.IsNullOrWhiteSpace(a) ? a : throw new Exception(), g, y >= 0 ? y : throw new Exception(), p >= 0 ? p : throw new Exception());
-
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Author { get; set; }
+        public string Genre { get; set; } 
+        public int Year { get; set; }
+        public decimal Price { get; set; }
+        public Book(int id, string t, string a, string g, int y, decimal p) =>
+            (Id, Title, Author, Genre, Year, Price) =
+            (id,
+             !string.IsNullOrWhiteSpace(t) ? t : throw new Exception(),
+             !string.IsNullOrWhiteSpace(a) ? a : throw new Exception(),
+             !string.IsNullOrWhiteSpace(g) ? g : throw new Exception(),
+             y >= 0 ? y : throw new Exception(),
+             p >= 0 ? p : throw new Exception());
         public override string ToString() => $"[ID: {Id}] \"{Title}\" — {Author} | Жанр: {Genre} | Год: {Year} | Цена: {Price:C}";
     }
-
     class Program
     {
+        static  List<string> DostypGenre = new List<string> { "Худож.лит-ра", "Научное", "Историческое", "Фантастика" };
+
+        static int nextId = 1;
+
         static List<Book> books = new List<Book>
         {
-            new Book("Властелин Колец", "Толкин", Genre.Fantasy, 1954, 1500),
-            new Book("Краткая история времени", "Хокинг", Genre.Science, 1988, 850),
-            new Book("Преступление и наказание", "Достоевский", Genre.Fiction, 1866, 600),
-            new Book("Хоббит", "Толкин", Genre.Fantasy, 1937, 1100),
-            new Book("История Древнего Рима", "Моммзен", Genre.History, 1856, 2300)
+            new Book(nextId++, "Властелин Колец", "Толкин", "Фантастика", 1954, 1500),
+            new Book(nextId++, "Краткая история времени", "Хокинг", "Научное", 1988, 850),
+            new Book(nextId++, "Преступление и наказание", "Достоевский", "Худож.лит-ра", 1866, 600),
+            new Book(nextId++, "Хоббит", "Толкин", "Фантастика", 1937, 1100),
+            new Book(nextId++, "История Древнего Рима", "Моммзен", "Историческое", 1856, 2300)
         };
-
         static void Main()
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
@@ -60,30 +62,31 @@ namespace CompactLibrary
                 }
             }
         }
-
         static void AddBook()
         {
             try
             {
                 Console.Write("Название: "); string t = Console.ReadLine();
                 Console.Write("Автор: "); string a = Console.ReadLine();
-                Console.Write("Жанр (1-Fiction, 2-Science, 3-History, 4-Fantasy): "); Genre g = (Genre)int.Parse(Console.ReadLine());
+                Console.WriteLine("Доступные жанры: " + string.Join(", ", DostypGenre));
+                Console.Write("Введите жанр из списка: ");
+                string g = Console.ReadLine()?.Trim();
+                string matchedGenre = DostypGenre.FirstOrDefault(gen => gen.Equals(g, StringComparison.OrdinalIgnoreCase));
+                if (matchedGenre == null) throw new Exception();
                 Console.Write("Год: "); int y = int.Parse(Console.ReadLine());
                 Console.Write("Цена: "); decimal p = decimal.Parse(Console.ReadLine());
-                books.Add(new Book(t, a, g, y, p));
+                books.Add(new Book(nextId++, t, a, matchedGenre, y, p));
                 Console.WriteLine("Добавлено.");
             }
             catch { Console.WriteLine("Ошибка ввода! Книга не добавлена."); }
         }
-
         static void RemoveBook()
         {
             Console.Write("Введите ID: ");
-            if (Guid.TryParse(Console.ReadLine(), out Guid id) && books.Remove(books.FirstOrDefault(b => b.Id == id)))
+            if (int.TryParse(Console.ReadLine(), out int id) && books.Remove(books.FirstOrDefault(b => b.Id == id)))
                 Console.WriteLine("Удалено.");
             else Console.WriteLine("Не найдено или неверный ID.");
         }
-
         static void SearchBooks()
         {
             Console.Write("1.По названию" +
@@ -91,12 +94,11 @@ namespace CompactLibrary
                 "\n3.По жанру: ");
             string choice = Console.ReadLine();
             Console.Write("Запрос: "); string q = Console.ReadLine();
-
             var res = choice switch
             {
                 "1" => books.Where(b => b.Title.Contains(q, StringComparison.OrdinalIgnoreCase)),
                 "2" => books.Where(b => b.Author.Contains(q, StringComparison.OrdinalIgnoreCase)),
-                "3" => books.Where(b => Enum.TryParse(q, true, out Genre g) && b.Genre == g),
+                "3" => books.Where(b => b.Genre.Contains(q, StringComparison.OrdinalIgnoreCase)),
                 _ => Enumerable.Empty<Book>()
             };
             res.ToList().ForEach(Console.WriteLine);
