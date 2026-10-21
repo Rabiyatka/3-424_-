@@ -11,14 +11,16 @@ namespace _3ИСИП424
         public string Genre { get; set; } 
         public int Year { get; set; }
         public decimal Price { get; set; }
-        public Book(int id, string t, string a, string g, int y, decimal p) =>
-            (Id, Title, Author, Genre, Year, Price) =
-            (id,
-             !string.IsNullOrWhiteSpace(t) ? t : throw new Exception(),
-             !string.IsNullOrWhiteSpace(a) ? a : throw new Exception(),
-             !string.IsNullOrWhiteSpace(g) ? g : throw new Exception(),
-             y >= 0 ? y : throw new Exception(),
-             p >= 0 ? p : throw new Exception());
+
+        public Book(int id, string t, string a, string g, int y, decimal p)
+        {
+            Id = id;
+            if (!string.IsNullOrWhiteSpace(t)) Title = t; else throw new Exception();
+            if (!string.IsNullOrWhiteSpace(a)) Author = a; else throw new Exception();
+            if (!string.IsNullOrWhiteSpace(g)) Genre = g; else throw new Exception();
+            if (y >= 0) Year = y; else throw new Exception();
+            if (p >= 0) Price = p; else throw new Exception();
+        }
         public override string ToString() => $"[ID: {Id}] \"{Title}\" — {Author} | Жанр: {Genre} | Год: {Year} | Цена: {Price:C}";
     }
     class Program
@@ -45,7 +47,7 @@ namespace _3ИСИП424
                     "\n3.Удалить" +
                     "\n4.Поиск" +
                     "\n5.Сортировка" +
-                    "\n6.Мин/Макс цене" +
+                    "\n6.Мин/Макс цена" +
                     "\n7.Авторы" +
                     "\n0.Выход" +
                     "\nВыбор: ");
@@ -99,7 +101,7 @@ namespace _3ИСИП424
                 "1" => books.Where(b => b.Title.Contains(q, StringComparison.OrdinalIgnoreCase)),
                 "2" => books.Where(b => b.Author.Contains(q, StringComparison.OrdinalIgnoreCase)),
                 "3" => books.Where(b => b.Genre.Contains(q, StringComparison.OrdinalIgnoreCase)),
-                _ => Enumerable.Empty<Book>()
+                _ => Enumerable.Empty<Book>()   
             };
             res.ToList().ForEach(Console.WriteLine);
         }
